@@ -1,0 +1,40 @@
+sigil:
+  public-url: ${SIGIL_PUBLIC_URL:https://sigil.test}
+  indieauth:
+    me: ${SIGIL_INDIEAUTH_ME:https://sigil.test}
+    service:
+      token: ${SIGIL_INDIEAUTH_SERVICE_TOKEN:test-service-token}
+    herald:
+      base-url: ${SIGIL_INDIEAUTH_HERALD_BASE_URL:https://herald.test}
+      authorize-path: ${SIGIL_INDIEAUTH_HERALD_AUTHORIZE_PATH:/auth}
+    github:
+      client-id: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_ID:test-client-id}
+      client-secret: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_SECRET:test-client-secret}
+
+logging:
+  level:
+    root: info
+
+spring:
+  application:
+    name: sigil
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    baseline-version: 0
+    baseline-on-migrate: true
+
+jobrunr:
+  background-job-server:
+    enabled: ${JOBRUNR_BACKGROUND_JOB_SERVER:false}
+  dashboard:
+    enabled: ${JOBRUNR_DASHBOARD_ENABLE:false}
+  database:
+    type: sql
