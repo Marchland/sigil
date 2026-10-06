@@ -16,12 +16,24 @@ When updating this file, preserve this bar for all agents and keep entries conci
 
 Sigil is the standalone IndieAuth provider for Jacob's site. It was extracted from Bastion, which is now a pure
 resource server. Sigil has no local accounts: GitHub is the only identity provider, and the browser-facing auth UI is
-delegated to the "Herald" (personal-site) service via `sigil.herald.*`.
+delegated to the "Herald" (personal-site) service via `sigil.server.herald.*`.
+
+## Repository layout
+
+- `sigil-client/` - published library (`dev.jacobandersen:sigil-client`) carrying the wire protocol types
+  (`dev.jacobandersen.sigil.protocol`, the app depends on these too) and the client SDK
+  (`dev.jacobandersen.sigil.client`): a `SigilClient` facade implementing narrow interfaces
+  (`TokenIntrospector`, `AuthorizationClient`, `DiscoveryClient`, `TokenRevoker`, `UserinfoClient`,
+  `ProviderCatalog`) plus a Spring Boot auto-configuration (`sigil.client.*`). Published to GitHub Packages Maven
+  from the release workflow; consumers need `packages: read` and a PAT even for reads.
+- `sigil-app/` - the Spring Boot server (`bootJar` -> `sigil.jar`), configuration under `sigil.server.*`, packaged
+  as the `ghcr.io/jacobandersen/sigil` image from the release workflow.
 
 ## Build and test
 
-- `./gradlew test` runs the full suite; Spring Boot tests use Testcontainers (needs Docker).
+- `./gradlew test` runs the full suite; the app's Spring Boot tests use Testcontainers (needs Docker).
 - `./gradlew ktlintCheck` runs the linter; `./gradlew ktlintFormat` fixes style.
+- Version is the root `version.txt`, managed by release-please.
 - Jackson 3 (`tools.jackson.*`) is used, not Jackson 2; `@JsonProperty` still comes from
   `com.fasterxml.jackson.annotation`.
 - JobRunr: methods invoked from a scheduled/enqueued job lambda must not use Kotlin default parameter values -
@@ -44,13 +56,14 @@ delegated to the "Herald" (personal-site) service via `sigil.herald.*`.
   (`grant_type=refresh_token`, same-or-narrower scope, single-use rotation via `RefreshTokenService`).
 - Introspection (`/indieauth/introspect`, RFC 7662 plus `me`), revocation (`/indieauth/revocation`, always 200), and
   userinfo (`/indieauth/userinfo`) are served and advertised. Profile claims come from static
-  `sigil.profile.*` config (`ProfileClaimService`); `email` needs both `profile` and `email` scopes.
-- Introspection accepts either an active Sigil-issued access token or the configured shared service token
-  (`sigil.service.token`, constant-time compared). Bastion uses the service token to validate Micropub
-  bearer tokens remotely; it holds no token state of its own.
+  `sigil.server.profile.*` config (`ProfileClaimService`); `email` needs both `profile` and `email` scopes.
+- Introspection is authorized by self-introspection: the bearer must equal the `token` being introspected
+  (constant-time). There is no service credential today; a resource server can only learn about tokens it holds.
+  Extend deliberately if cross-token/audience introspection is ever needed.
 - Raw `state`/`code`/`access_token`/`refresh_token` values are never persisted - only their SHA-256 digests
-  (`security/Tokens.kt`). PKCE is lenient for max client compat: a missing `code_challenge` is accepted with a
-  warning, S256-only when present, and redemption enforces the conditional rule.
+  (`security/Tokens.kt`). PKCE helper lives in the client (`protocol/Pkce.kt`) and is used by both sides. PKCE is
+  lenient for max client compat: a missing `code_challenge` is accepted with a warning, S256-only when present, and
+  redemption enforces the conditional rule.
 - Client validation (`util/IndieAuthUrls.kt`, `service/ClientMetadataFetcher.kt`) enforces strict profile/client URL
   rules and the 4.2.2 cross-host redirect allowlist (JSON `redirect_uris`, `Link rel=redirect_uri`, HTML link tags).
   Loopback clients are never fetched; inconclusive fetches allow with a warning (fail-open), a fetched allowlist

@@ -1,0 +1,53 @@
+sigil:
+  server:
+    public-url: ${SIGIL_SERVER_PUBLIC_URL}
+    me: ${SIGIL_SERVER_ME}
+    code-ttl: ${SIGIL_SERVER_CODE_TTL:10m}
+    auth-request-ttl: ${SIGIL_SERVER_AUTH_REQUEST_TTL:10m}
+    access-token-ttl: ${SIGIL_SERVER_ACCESS_TOKEN_TTL:30d}
+    refresh-token-ttl: ${SIGIL_SERVER_REFRESH_TOKEN_TTL:90d}
+    purge-interval: ${SIGIL_SERVER_PURGE_INTERVAL:1h}
+    code-retention: ${SIGIL_SERVER_CODE_RETENTION:1d}
+    herald:
+      base-url: ${SIGIL_SERVER_HERALD_BASE_URL:}
+      authorize-path: ${SIGIL_SERVER_HERALD_AUTHORIZE_PATH:/auth}
+    profile:
+      name: ${SIGIL_SERVER_PROFILE_NAME:}
+      url: ${SIGIL_SERVER_PROFILE_URL:}
+      photo: ${SIGIL_SERVER_PROFILE_PHOTO:}
+      email: ${SIGIL_SERVER_PROFILE_EMAIL:}
+    github:
+      client-id: ${SIGIL_SERVER_GITHUB_CLIENT_ID:}
+      client-secret: ${SIGIL_SERVER_GITHUB_CLIENT_SECRET:}
+      redirect-uri: ${SIGIL_SERVER_GITHUB_REDIRECT_URI:}
+      authorize-url: ${SIGIL_SERVER_GITHUB_AUTHORIZE_URL:https://github.com/login/oauth/authorize}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:info}
+
+spring:
+  application:
+    name: sigil
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    url: jdbc:postgresql://${SPRING_PG_HOST}:${SPRING_PG_PORT:5432}/${SPRING_PG_DB}
+    username: ${SPRING_PG_USERNAME}
+    password: ${SPRING_PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+jobrunr:
+  background-job-server:
+    enabled: ${JOBRUNR_BACKGROUND_JOB_SERVER:true}
+  dashboard:
+    enabled: ${JOBRUNR_DASHBOARD_ENABLE:true}
+  database:
+    type: sql
