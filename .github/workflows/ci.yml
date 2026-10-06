@@ -10,11 +10,11 @@ permissions:
 
 env:
   SIGIL_PUBLIC_URL: https://sigil.test
-  SIGIL_INDIEAUTH_ME: https://sigil.test
-  SIGIL_INDIEAUTH_SERVICE_TOKEN: test-service-token
-  SIGIL_INDIEAUTH_HERALD_BASE_URL: https://herald.test
-  SIGIL_INDIEAUTH_GITHUB_CLIENT_ID: test-client-id
-  SIGIL_INDIEAUTH_GITHUB_CLIENT_SECRET: test-client-secret
+  SIGIL_ME: https://sigil.test
+  SIGIL_SERVICE_TOKEN: test-service-token
+  SIGIL_HERALD_BASE_URL: https://herald.test
+  SIGIL_GITHUB_CLIENT_ID: test-client-id
+  SIGIL_GITHUB_CLIENT_SECRET: test-client-secret
   SPRING_PG_HOST: localhost
   SPRING_PG_PORT: "5432"
   SPRING_PG_DB: sigil

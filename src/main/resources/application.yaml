@@ -1,28 +1,27 @@
 sigil:
   public-url: ${SIGIL_PUBLIC_URL}
-  indieauth:
-    me: ${SIGIL_INDIEAUTH_ME}
-    code-ttl: ${SIGIL_INDIEAUTH_CODE_TTL:10m}
-    auth-request-ttl: ${SIGIL_INDIEAUTH_AUTH_REQUEST_TTL:10m}
-    access-token-ttl: ${SIGIL_INDIEAUTH_ACCESS_TOKEN_TTL:30d}
-    refresh-token-ttl: ${SIGIL_INDIEAUTH_REFRESH_TOKEN_TTL:90d}
-    purge-interval: ${SIGIL_INDIEAUTH_PURGE_INTERVAL:1h}
-    code-retention: ${SIGIL_INDIEAUTH_CODE_RETENTION:1d}
-    service:
-      token: ${SIGIL_INDIEAUTH_SERVICE_TOKEN:}
-    herald:
-      base-url: ${SIGIL_INDIEAUTH_HERALD_BASE_URL:}
-      authorize-path: ${SIGIL_INDIEAUTH_HERALD_AUTHORIZE_PATH:/auth}
-    profile:
-      name: ${SIGIL_INDIEAUTH_PROFILE_NAME:}
-      url: ${SIGIL_INDIEAUTH_PROFILE_URL:}
-      photo: ${SIGIL_INDIEAUTH_PROFILE_PHOTO:}
-      email: ${SIGIL_INDIEAUTH_PROFILE_EMAIL:}
-    github:
-      client-id: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_ID:}
-      client-secret: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_SECRET:}
-      redirect-uri: ${SIGIL_INDIEAUTH_GITHUB_REDIRECT_URI:}
-      authorize-url: ${SIGIL_INDIEAUTH_GITHUB_AUTHORIZE_URL:https://github.com/login/oauth/authorize}
+  me: ${SIGIL_ME}
+  code-ttl: ${SIGIL_CODE_TTL:10m}
+  auth-request-ttl: ${SIGIL_AUTH_REQUEST_TTL:10m}
+  access-token-ttl: ${SIGIL_ACCESS_TOKEN_TTL:30d}
+  refresh-token-ttl: ${SIGIL_REFRESH_TOKEN_TTL:90d}
+  purge-interval: ${SIGIL_PURGE_INTERVAL:1h}
+  code-retention: ${SIGIL_CODE_RETENTION:1d}
+  service:
+    token: ${SIGIL_SERVICE_TOKEN:}
+  herald:
+    base-url: ${SIGIL_HERALD_BASE_URL:}
+    authorize-path: ${SIGIL_HERALD_AUTHORIZE_PATH:/auth}
+  profile:
+    name: ${SIGIL_PROFILE_NAME:}
+    url: ${SIGIL_PROFILE_URL:}
+    photo: ${SIGIL_PROFILE_PHOTO:}
+    email: ${SIGIL_PROFILE_EMAIL:}
+  github:
+    client-id: ${SIGIL_GITHUB_CLIENT_ID:}
+    client-secret: ${SIGIL_GITHUB_CLIENT_SECRET:}
+    redirect-uri: ${SIGIL_GITHUB_REDIRECT_URI:}
+    authorize-url: ${SIGIL_GITHUB_AUTHORIZE_URL:https://github.com/login/oauth/authorize}
 
 logging:
   level:

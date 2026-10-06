@@ -1,15 +1,14 @@
 sigil:
   public-url: ${SIGIL_PUBLIC_URL:https://sigil.test}
-  indieauth:
-    me: ${SIGIL_INDIEAUTH_ME:https://sigil.test}
-    service:
-      token: ${SIGIL_INDIEAUTH_SERVICE_TOKEN:test-service-token}
-    herald:
-      base-url: ${SIGIL_INDIEAUTH_HERALD_BASE_URL:https://herald.test}
-      authorize-path: ${SIGIL_INDIEAUTH_HERALD_AUTHORIZE_PATH:/auth}
-    github:
-      client-id: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_ID:test-client-id}
-      client-secret: ${SIGIL_INDIEAUTH_GITHUB_CLIENT_SECRET:test-client-secret}
+  me: ${SIGIL_ME:https://sigil.test}
+  service:
+    token: ${SIGIL_SERVICE_TOKEN:test-service-token}
+  herald:
+    base-url: ${SIGIL_HERALD_BASE_URL:https://herald.test}
+    authorize-path: ${SIGIL_HERALD_AUTHORIZE_PATH:/auth}
+  github:
+    client-id: ${SIGIL_GITHUB_CLIENT_ID:test-client-id}
+    client-secret: ${SIGIL_GITHUB_CLIENT_SECRET:test-client-secret}
 
 logging:
   level:

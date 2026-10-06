@@ -16,7 +16,7 @@ When updating this file, preserve this bar for all agents and keep entries conci
 
 Sigil is the standalone IndieAuth provider for Jacob's site. It was extracted from Bastion, which is now a pure
 resource server. Sigil has no local accounts: GitHub is the only identity provider, and the browser-facing auth UI is
-delegated to the "Herald" (personal-site) service via `sigil.indieauth.herald.*`.
+delegated to the "Herald" (personal-site) service via `sigil.herald.*`.
 
 ## Build and test
 
@@ -44,9 +44,9 @@ delegated to the "Herald" (personal-site) service via `sigil.indieauth.herald.*`
   (`grant_type=refresh_token`, same-or-narrower scope, single-use rotation via `RefreshTokenService`).
 - Introspection (`/indieauth/introspect`, RFC 7662 plus `me`), revocation (`/indieauth/revocation`, always 200), and
   userinfo (`/indieauth/userinfo`) are served and advertised. Profile claims come from static
-  `sigil.indieauth.profile.*` config (`ProfileClaimService`); `email` needs both `profile` and `email` scopes.
+  `sigil.profile.*` config (`ProfileClaimService`); `email` needs both `profile` and `email` scopes.
 - Introspection accepts either an active Sigil-issued access token or the configured shared service token
-  (`sigil.indieauth.service.token`, constant-time compared). Bastion uses the service token to validate Micropub
+  (`sigil.service.token`, constant-time compared). Bastion uses the service token to validate Micropub
   bearer tokens remotely; it holds no token state of its own.
 - Raw `state`/`code`/`access_token`/`refresh_token` values are never persisted - only their SHA-256 digests
   (`security/Tokens.kt`). PKCE is lenient for max client compat: a missing `code_challenge` is accepted with a
