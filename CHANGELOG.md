@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/Marchland/sigil/compare/v0.2.0...v0.2.1) (2026-10-06)
+
+
+### Miscellaneous Chores
+
+* move packages and image to Marchland ([ce3f011](https://github.com/Marchland/sigil/commit/ce3f0118f45588744a6f278cf0cd114cdb4103cc))
+* move packages and image to Marchland ([41c97a5](https://github.com/Marchland/sigil/commit/41c97a5b860a235fec6cf41ba1287049f1b8bd3c))
+
 ## [0.2.0](https://github.com/jacobsandersen/sigil/compare/v0.1.0...v0.2.0) (2026-10-06)
 
 
