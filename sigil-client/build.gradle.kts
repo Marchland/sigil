@@ -66,7 +66,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/jacobsandersen/sigil")
+            url = uri("https://maven.pkg.github.com/marchland/sigil")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: (project.findProperty("gpr.user") as String?)
                 password = System.getenv("GITHUB_TOKEN") ?: (project.findProperty("gpr.token") as String?)
