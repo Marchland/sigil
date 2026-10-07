@@ -70,13 +70,17 @@ class AuthorizationService(
     /** Starts the flow, returning the Herald redirect location. */
     @Transactional
     fun begin(request: AuthorizationRequest): String {
-        validateResponseType(request.responseType)
-        validateMe(request.me)
+        // OAuth 2.0 4.1.2.1: only redirect an error once the client and its
+        // redirect_uri are trusted. These three throw UntrustedClientException,
+        // which the controller renders instead of redirecting.
         validateRedirectUri(request.redirectUri)
         validateClientId(request.clientId)
+        validateRedirectAllowed(request.clientId!!, request.redirectUri!!)
+
+        validateResponseType(request.responseType)
+        validateMe(request.me)
         val scope = validateScope(request.scope)
         validatePkce(request.codeChallenge, request.codeChallengeMethod)
-        validateRedirectAllowed(request.clientId!!, request.redirectUri!!)
 
         if (config.herald.baseUrl.isBlank()) {
             throw IndieAuthException(IndieAuthError.Code.SERVER_ERROR, "The authentication UI host is not configured")
@@ -129,7 +133,7 @@ class AuthorizationService(
         }
 
         if (error != null) {
-            return CompleteResult.Redirect(errorRedirect(authRequest, error))
+            return CompleteResult.Redirect(errorRedirect(authRequest, providerError(error)))
         }
 
         if (authRequest.expiresAt.isBefore(Instant.now())) {
@@ -246,12 +250,26 @@ class AuthorizationService(
         description: String? = null,
     ): String = Redirects.error(authRequest.redirectUri, authRequest.clientState, error, description)
 
+    /** Maps a provider-supplied error to a known OAuth code instead of reflecting it verbatim. */
+    private fun providerError(error: String): String =
+        when (error.lowercase()) {
+            IndieAuthError.Code.ACCESS_DENIED.value,
+            IndieAuthError.Code.SERVER_ERROR.value,
+            IndieAuthError.Code.INVALID_REQUEST.value,
+            -> error.lowercase()
+
+            else -> IndieAuthError.Code.ACCESS_DENIED.value
+        }
+
     private fun validateResponseType(responseType: String?) {
-        if (responseType != null && responseType != "code") {
-            throw IndieAuthException(
-                IndieAuthError.Code.UNSUPPORTED_RESPONSE_TYPE,
-                "Only the 'code' response type is supported",
-            )
+        when {
+            responseType.isNullOrBlank() -> {
+                throw IndieAuthException(IndieAuthError.Code.INVALID_REQUEST, "The 'response_type' parameter is required")
+            }
+
+            responseType != "code" -> {
+                throw IndieAuthException(IndieAuthError.Code.UNSUPPORTED_RESPONSE_TYPE, "Only the 'code' response type is supported")
+            }
         }
     }
 
@@ -271,13 +289,13 @@ class AuthorizationService(
 
     private fun validateRedirectUri(redirectUri: String?) {
         if (redirectUri.isNullOrBlank() || !Uris.isRedirectUri(redirectUri)) {
-            throw IndieAuthException(IndieAuthError.Code.INVALID_REQUEST, "A valid 'redirect_uri' is required")
+            throw UntrustedClientException(IndieAuthError.Code.INVALID_REQUEST, "A valid 'redirect_uri' is required")
         }
     }
 
     private fun validateClientId(clientId: String?) {
         if (clientId.isNullOrBlank() || !IndieAuthUrls.isValidClientId(clientId)) {
-            throw IndieAuthException(IndieAuthError.Code.INVALID_REQUEST, "A valid 'client_id' URL is required")
+            throw UntrustedClientException(IndieAuthError.Code.INVALID_REQUEST, "A valid 'client_id' URL is required")
         }
     }
 
@@ -308,7 +326,7 @@ class AuthorizationService(
         }
         val match = allowed.any { it == redirectUri || UrlNormalizer.identity(it) == UrlNormalizer.identity(redirectUri) }
         if (!match) {
-            throw IndieAuthException(
+            throw UntrustedClientException(
                 IndieAuthError.Code.INVALID_REQUEST,
                 "The 'redirect_uri' is not published by the client",
             )
@@ -321,7 +339,7 @@ class AuthorizationService(
         if (invalid.isNotEmpty()) {
             throw IndieAuthException(
                 IndieAuthError.Code.INVALID_SCOPE,
-                "Unsupported scope requested: ${invalid.joinToString(" ")}",
+                "One or more requested scopes are not supported",
             )
         }
         return requested

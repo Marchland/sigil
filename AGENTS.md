@@ -45,11 +45,16 @@ delegated to the "Herald" (personal-site) service via `sigil.server.herald.*`.
 
 - Server metadata is served from `/.well-known/oauth-authorization-server` (plus the legacy `.well-known`
   endpoint probes) and advertises the `issuer` (trailing-slash normalized, https-only via `util/Issuers.kt`), the
-  token/introspection/revocation/userinfo endpoints, and `authorization_response_iss_parameter_supported=true`. The
-  metadata URL itself is discovered via the `indieauth-metadata` link relation published on the external `me` site;
-  Sigil serves no profile pages.
+  token/introspection/revocation/userinfo endpoints, `*_endpoint_auth_methods_supported = ["none"]`, and
+  `authorization_response_iss_parameter_supported=true`. The metadata URL itself is discovered via the
+  `indieauth-metadata` link relation published on the external `me` site; Sigil serves no profile pages.
+- Error semantics: the authorization endpoint redirects an error to the client only when the client and its
+  `redirect_uri` are trusted. `AuthorizationService.begin` validates those first and throws `UntrustedClientException`
+  (a subtype of `IndieAuthException`, `service/IndieAuthException.kt`), which `AuthorizationController` renders
+  instead of redirecting (OAuth 2.0 4.1.2.1). `response_type=code` is required. Framework-level failures use the same
+  JSON shape via `controller/IndieAuthExceptionHandler`.
 - The authorization redirect carries `code` + `state` + `iss` (`util/Redirects.kt`); `iss` must equal the metadata
-  issuer for mix-up protection.
+  issuer for mix-up protection. A provider `error` is mapped to a known OAuth code, never reflected verbatim.
 - Code redemption is split per spec: POST `/indieauth/auth` returns `{me}` only (`ProfileUrlController` +
   `ProfileUrlService`), POST `/indieauth/token` returns tokens (`TokenController` + `AccessTokenService`) and rejects
   empty-scope codes with `invalid_grant`. Token responses carry `expires_in` and rotate a `refresh_token`

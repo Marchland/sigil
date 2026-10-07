@@ -8,9 +8,19 @@ import dev.jacobandersen.sigil.protocol.IndieAuthError
  * appropriate response shape (a redirect on the authorization endpoints, JSON
  * on the token endpoint).
  */
-class IndieAuthException(
+open class IndieAuthException(
     val code: IndieAuthError.Code,
     description: String? = null,
 ) : RuntimeException(description) {
     fun toError(): IndieAuthError = IndieAuthError.of(code, message)
 }
+
+/**
+ * A failure validating the client or its `redirect_uri`. OAuth 2.0 (4.1.2.1)
+ * forbids redirecting an error to an untrusted `redirect_uri`, so the
+ * authorization endpoint renders these instead of redirecting.
+ */
+class UntrustedClientException(
+    code: IndieAuthError.Code,
+    description: String? = null,
+) : IndieAuthException(code, description)

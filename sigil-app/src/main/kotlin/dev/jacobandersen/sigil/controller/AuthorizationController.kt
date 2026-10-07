@@ -6,8 +6,8 @@ import dev.jacobandersen.sigil.service.AuthorizationRequest
 import dev.jacobandersen.sigil.service.AuthorizationService
 import dev.jacobandersen.sigil.service.CompleteResult
 import dev.jacobandersen.sigil.service.IndieAuthException
+import dev.jacobandersen.sigil.service.UntrustedClientException
 import dev.jacobandersen.sigil.util.Redirects
-import dev.jacobandersen.sigil.util.Uris
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,6 +21,10 @@ import java.net.URI
  * Herald UI host; the callback receives the browser back from Herald and
  * redirects to the client's `redirect_uri` with Sigil's own authorization
  * code. Neither endpoint renders any UI itself.
+ *
+ * Errors are only redirected once the client and its `redirect_uri` are
+ * trusted (OAuth 2.0 4.1.2.1); an untrusted client gets the error rendered at
+ * the endpoint instead.
  */
 @RestController
 class AuthorizationController(
@@ -49,15 +53,16 @@ class AuthorizationController(
                 codeChallengeMethod = codeChallengeMethod,
             )
 
-        val canRedirect = !redirectUri.isNullOrBlank() && Uris.isRedirectUri(redirectUri)
-
         return try {
             redirect(authorizationService.begin(request))
+        } catch (e: UntrustedClientException) {
+            errorResponse(e)
         } catch (e: IndieAuthException) {
-            if (canRedirect) {
-                redirect(Redirects.error(redirectUri, state, e.code.value, e.message))
-            } else {
+            val target = request.redirectUri
+            if (target.isNullOrBlank()) {
                 errorResponse(e)
+            } else {
+                redirect(Redirects.error(target, request.state, e.code.value, e.message))
             }
         }
     }
