@@ -104,7 +104,9 @@ class IndieAuthIntegrationTest {
             .andExpect(jsonPath("$.token_endpoint").value("https://sigil.test/indieauth/token"))
             .andExpect(jsonPath("$.introspection_endpoint").value("https://sigil.test/indieauth/introspect"))
             .andExpect(jsonPath("$.revocation_endpoint").value("https://sigil.test/indieauth/revocation"))
+            .andExpect(jsonPath("$.token_endpoint_auth_methods_supported[0]").value("none"))
             .andExpect(jsonPath("$.revocation_endpoint_auth_methods_supported[0]").value("none"))
+            .andExpect(jsonPath("$.introspection_endpoint_auth_methods_supported[0]").value("none"))
             .andExpect(jsonPath("$.userinfo_endpoint").value("https://sigil.test/indieauth/userinfo"))
             .andExpect(jsonPath("$.code_challenge_methods_supported[0]").value("S256"))
             .andExpect(jsonPath("$.authorization_response_iss_parameter_supported").value(true))
@@ -527,6 +529,7 @@ class IndieAuthIntegrationTest {
                     .param("client_id", clientId)
                     .param("redirect_uri", redirectUri)
                     .param("state", "client-state")
+                    .param("response_type", "code")
                     .param("scope", "create admin"),
             ).andExpect(status().isFound)
             .andExpect(
@@ -535,6 +538,48 @@ class IndieAuthIntegrationTest {
                     org.hamcrest.Matchers.containsString("error=invalid_scope"),
                 ),
             )
+    }
+
+    @Test
+    fun `authorization with an invalid client id is not redirected`() {
+        mockMvc
+            .perform(
+                get("/indieauth/auth")
+                    .param("client_id", "not-a-url")
+                    .param("redirect_uri", redirectUri)
+                    .param("state", "client-state")
+                    .param("response_type", "code"),
+            ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.error").value("invalid_request"))
+            .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
+    }
+
+    @Test
+    fun `authorization without a response type redirects invalid_request`() {
+        mockMvc
+            .perform(
+                get("/indieauth/auth")
+                    .param("client_id", clientId)
+                    .param("redirect_uri", redirectUri)
+                    .param("state", "client-state"),
+            ).andExpect(status().isFound)
+            .andExpect(
+                header().string(
+                    HttpHeaders.LOCATION,
+                    org.hamcrest.Matchers.containsString("error=invalid_request"),
+                ),
+            )
+    }
+
+    @Test
+    fun `token endpoint rejects an unsupported content type with the protocol error shape`() {
+        mockMvc
+            .perform(
+                post("/indieauth/token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"),
+            ).andExpect(status().isUnsupportedMediaType)
+            .andExpect(jsonPath("$.error").value("invalid_request"))
     }
 
     // -------------------------------------------------------------- row purge

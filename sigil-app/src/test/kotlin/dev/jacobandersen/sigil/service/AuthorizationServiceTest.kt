@@ -245,6 +245,16 @@ class AuthorizationServiceTest {
         assertCode(IndieAuthError.Code.UNSUPPORTED_RESPONSE_TYPE) { service.begin(request(responseType = "token")) }
     }
 
+    @Test
+    fun `begin rejects a missing response type`() {
+        assertCode(IndieAuthError.Code.INVALID_REQUEST) { service.begin(request(responseType = null)) }
+    }
+
+    @Test
+    fun `begin treats an invalid client id as untrusted`() {
+        assertThrows(UntrustedClientException::class.java) { service.begin(request(clientId = "not-a-url")) }
+    }
+
     // --------------------------------------------------------------- complete
 
     @Test
