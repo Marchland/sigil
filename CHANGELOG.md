@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/Marchland/sigil/compare/v0.2.1...v0.2.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **indieauth:** only redirect errors to trusted clients and unify error shape ([78314a3](https://github.com/Marchland/sigil/commit/78314a3ba0654c614666808b93dc7e7d01af51ba))
+* **indieauth:** only redirect errors to trusted clients and unify error shape ([3e4a72a](https://github.com/Marchland/sigil/commit/3e4a72af5a960baf6b70d37eb2ca347a34be132f))
+
 ## [0.2.1](https://github.com/Marchland/sigil/compare/v0.2.0...v0.2.1) (2026-10-06)
 
 
